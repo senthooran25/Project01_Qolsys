@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "154166479977",
+    "firebase_url": "https://iqcloud-mobile-apps.firebaseio.com",
+    "project_id": "iqcloud-mobile-apps",
+    "storage_bucket": "iqcloud-mobile-apps.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:154166479977:android:997fcc34712df299c066f8",
+        "android_client_info": {
+          "package_name": "com.jci.iq.user.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "154166479977-likmbt2rb93t1gjc3lf5f6jfcrka89o6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiREST7psPaKNTd0NsTDp7yCTXRFluZ5s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "154166479977-likmbt2rb93t1gjc3lf5f6jfcrka89o6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "154166479977-7kkqu3qcn0rav20308f98chmtapc0h03.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.jci.iq.user.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

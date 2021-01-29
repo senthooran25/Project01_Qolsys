@@ -1,0 +1,1 @@
+Control your devices. This application allows you to connect various IoT devices together on a network and use them.

@@ -1,0 +1,167 @@
+
+lane :apply_new_version do
+  flutter_version_manager(
+    arguments: "-apply",
+    yml: "./version.yml",
+    pubspec: "./pubspec.yaml")
+end 
+
+platform :android do
+  desc "Deploy to closed beta track"
+  lane :closed_beta do
+    begin
+      gradle(
+        task: "clean",
+        project_dir: 'android/')
+      gradle(
+        task: "bundle",
+        build_type: 'Release',
+        project_dir: 'android/'
+      )
+      upload_to_play_store(
+        track: 'Closed beta',
+        aab: 'build/app/outputs/bundle/release/app-release.aab',
+        skip_upload_metadata: true,
+        skip_upload_images: true,
+        skip_upload_screenshots: true,
+        release_status: "draft",
+        skip_upload_apk: true,
+        version_code: flutter_version(pubspec_location: "./pubspec.yaml")["version_code"],
+      )
+    end
+  end
+
+  desc "Distribute to firebase"
+    lane :distribute_to_firebase do
+
+      FIREBASE_ANDROID_APP_ID = ENV["FIREBASE_ANDROID_APP_ID"]
+      FIREBASE_CLI_TOKEN = ENV["FIREBASE_CLI_TOKEN"]
+
+      commit = last_git_commit
+      firebase_app_distribution(
+          app: "#{FIREBASE_ANDROID_APP_ID}",
+          apk_path: "build/app/outputs/apk/debug/app-debug.apk",
+          groups: "DEV",
+          firebase_cli_token: "#{FIREBASE_CLI_TOKEN}",
+          release_notes: commit[:message]
+      )
+  end
+end
+
+
+platform :ios do
+
+  DEVELOPER_APP_ID = ENV["DEVELOPER_APP_ID"]
+  DEVELOPER_APP_IDENTIFIER = ENV["DEVELOPER_APP_IDENTIFIER"]
+  PROVISIONING_PROFILE_SPECIFIER = ENV["PROVISIONING_PROFILE_SPECIFIER"]
+  PROVISIONING_PROFILE_SPECIFIER_ADHOC = ENV["PROVISIONING_PROFILE_SPECIFIER_ADHOC"]
+  TEMP_KEYCHAIN_USER = ENV["TEMP_KEYCHAIN_USER"]
+  TEMP_KEYCHAIN_PASSWORD = ENV["TEMP_KEYCHAIN_PASSWORD"]
+  FIREBASE_CLI_TOKEN = ENV["FIREBASE_CLI_TOKEN"]
+  FIREBASE_IOS_APP_ID = ENV["FIREBASE_IOS_APP_ID"]
+
+  def delete_temp_keychain(name)
+    delete_keychain(
+      name: name
+    ) if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
+  end
+
+  def create_temp_keychain(name, password)
+    create_keychain(
+      name: name,
+      password: password,
+      unlock: false,
+      timeout: false
+    )
+  end
+
+  def ensure_temp_keychain(name, password)
+    delete_temp_keychain(name)
+    create_temp_keychain(name, password)
+  end
+
+  desc "Deploy to TestFlight"
+  lane :closed_beta do |options|
+
+    keychain_name = TEMP_KEYCHAIN_USER
+    keychain_password = TEMP_KEYCHAIN_PASSWORD
+    ensure_temp_keychain(keychain_name, keychain_password)
+
+    match(
+      type: 'appstore',
+      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+      git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+      readonly: true,
+      keychain_name: keychain_name,
+      keychain_password: keychain_password 
+    )
+
+    gym(
+      configuration: "Release",
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: { 
+            DEVELOPER_APP_ID => PROVISIONING_PROFILE_SPECIFIER
+        }
+      }
+    )
+
+    commit = last_git_commit
+    pilot(
+      apple_id: "#{DEVELOPER_APP_ID}",
+      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+      skip_waiting_for_build_processing: options[:wait_for_build_processing] ? false : true,
+      skip_submission: true,
+      distribute_external: false,
+      notify_external_testers: false,
+      ipa: "./IQ Connect.ipa",
+      # changelog: commit[:message]
+    )
+
+    delete_temp_keychain(keychain_name)
+  end
+
+  desc "Distribute to firebase"
+    lane :distribute_to_firebase do
+
+        keychain_name = TEMP_KEYCHAIN_USER
+        keychain_password = TEMP_KEYCHAIN_PASSWORD
+        ensure_temp_keychain(keychain_name, keychain_password)
+
+        match(
+          type: 'adhoc',
+          app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+          git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+          readonly: true,
+          keychain_name: keychain_name,
+          keychain_password: keychain_password 
+        )
+
+        build_app(
+          export_method: "ad-hoc",
+          export_options: {
+            method: "ad-hoc",
+            provisioningProfiles: { 
+                DEVELOPER_APP_IDENTIFIER => PROVISIONING_PROFILE_SPECIFIER_ADHOC
+            }
+          },
+          workspace: "ios/Runner.xcworkspace",
+          configuration: "Profile",
+          scheme: "Runner",
+          silent: true,
+          clean: true,
+          output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
+          output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
+        )
+
+        commit = last_git_commit
+        firebase_app_distribution(
+            app: "#{FIREBASE_IOS_APP_ID}",
+            groups: "DEV",
+            firebase_cli_token: "#{FIREBASE_CLI_TOKEN}",
+            release_notes: commit[:message]
+        )
+  end
+end

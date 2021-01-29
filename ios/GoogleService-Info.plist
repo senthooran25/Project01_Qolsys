@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>154166479977-m06jqluapcaeves3bi938tg9e1d3tke6.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.154166479977-m06jqluapcaeves3bi938tg9e1d3tke6</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDnUHzgDu1D4MZo1KAWLiNHMhzJWnCxwlU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>154166479977</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.jci.iq.user.app</string>
+	<key>PROJECT_ID</key>
+	<string>iqcloud-mobile-apps</string>
+	<key>STORAGE_BUCKET</key>
+	<string>iqcloud-mobile-apps.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:154166479977:ios:dcc2070c640f3364c066f8</string>
+	<key>DATABASE_URL</key>
+	<string>https://iqcloud-mobile-apps.firebaseio.com</string>
+</dict>
+</plist>

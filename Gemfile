@@ -1,0 +1,9 @@
+source "https://rubygems.org"
+
+gem "fastlane"
+gem 'dotenv-rails', groups: [:development, :test]
+gem 'git'
+gem "fastlane-plugin-flutter_version", git: "https://github.com/tianhaoz95/fastlane-plugin-flutter-version"
+
+plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
+eval_gemfile(plugins_path) if File.exist?(plugins_path)
